@@ -11,8 +11,9 @@ def write_tree(directory='.'):
             if is_ignored(full):
                 continue
             if entry.is_file(follow_symlinks=False):
-                # TODO: write the file to object store
-                print(full)
+                with open(full, 'rb') as f:
+                    hashed = data.hash_object(f.read())
+                    print(hashed, full)
             elif entry.is_dir(follow_symlinks=False):
                 write_tree(full)
 
