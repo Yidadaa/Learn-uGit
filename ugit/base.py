@@ -50,8 +50,21 @@ def get_tree(oid, base_path=''):
     return result
 
 
+def _empty_current_directory():
+    for root, dirnames, filenames in os.walk('.', topdown=False):
+        for filename in filenames:
+            path = os.path.relpath(f'{root}/{filename}')
+            if is_ignored(path) or not os.path.isfile(path):
+                continue
+            try:
+                os.rmdir(path)
+            except (FileNotFoundError, OSError):
+                pass
+
+
 def read_tree(tree_oid):
     '''Get tree and write tree back to directory.'''
+    _empty_current_directory()
     for path, oid in get_tree(tree_oid, base_path='./').items():
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'wb') as f:
