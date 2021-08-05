@@ -71,5 +71,14 @@ def read_tree(tree_oid):
             f.write(data.get_object(oid))
 
 
+def commit(message):
+    commit = ''.join([
+        f'tree {write_tree()}\n',
+        '\n',
+        f'{message}\n'
+    ])
+    return data.hash_object(commit.encode(), 'commit')
+
+
 def is_ignored(path):
     return '.ugit' in path.split('/')
