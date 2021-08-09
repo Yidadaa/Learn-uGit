@@ -22,6 +22,7 @@ def get_ref(ref):
     if os.path.isfile(ref_path):
         with open(ref_path) as f:
             return f.read().strip()
+    return None
 
 
 def hash_object(data, type_='blob'):
