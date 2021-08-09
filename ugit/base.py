@@ -76,24 +76,26 @@ def read_tree(tree_oid):
 
 
 def commit(message):
-    HEAD = data.get_HEAD()
+    HEAD = data.get_ref('HEAD')
     commit = ''.join([
         f'tree {write_tree()}\n',
         '\n' if not HEAD else f'parent {HEAD}\n\n',
         f'{message}\n'
     ])
     oid = data.hash_object(commit.encode(), 'commit')
-    data.set_HEAD(oid)
+    data.update_ref('HEAD', oid)
     return oid
 
 
 def checkout(oid):
     commit = get_commit(oid)
     read_tree(commit.tree)
-    data.set_HEAD(oid)
+    data.update_ref('HEAD', oid)
+
 
 def create_tag(args):
     pass
+
 
 Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
 
@@ -117,4 +119,3 @@ def get_commit(oid):
 
 def is_ignored(path):
     return '.ugit' in path.split('/')
-
