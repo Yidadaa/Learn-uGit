@@ -92,14 +92,11 @@ def commit(args):
 
 
 def log(args):
-    oid = args.oid
-    while oid:
+    for oid in base.iter_commits_and_parents({args.oid}):
         commit = base.get_commit(oid)
         print(f'commit {oid}\n')
         print(textwrap.indent(commit.message, '    '))
         print('')
-
-        oid = commit.parent
 
 
 def checkout(args):
@@ -117,13 +114,13 @@ def k(args):
     for refname, ref in data.iter_refs():
         dot.node(refname)
         dot.node(ref)
-        dot.edge(refname, ref)
+        dot.edge(ref, refname)
         oids.add(ref)
 
     for oid in base.iter_commits_and_parents(oids):
         commit = base.get_commit(oid)
         dot.node(oid, oid[:10])
         if commit.parent:
-            dot.edge(oid, commit.parent)
+            dot.edge(commit.parent, oid)
     print(dot.source)
     dot.render(f'{os.getcwd()}/{data.GIT_DIR}/output.gv', view=True)
