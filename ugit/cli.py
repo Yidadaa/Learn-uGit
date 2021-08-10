@@ -2,6 +2,8 @@ import argparse
 import sys
 import os
 import textwrap
+from graphviz import Digraph
+from graphviz.backend import view
 
 from . import base
 from . import data
@@ -110,13 +112,18 @@ def tag(args):
 
 
 def k(args):
+    dot = Digraph(comment='digraph commits')
     oids = set()
     for refname, ref in data.iter_refs():
-        print(refname, ref)
+        dot.node(refname)
+        dot.node(ref)
+        dot.edge(refname, ref)
         oids.add(ref)
 
     for oid in base.iter_commits_and_parents(oids):
         commit = base.get_commit(oid)
-        print(oid)
+        dot.node(oid, oid[:10])
         if commit.parent:
-            print('Parent', commit.parent)
+            dot.edge(oid, commit.parent)
+    print(dot.source)
+    dot.render(f'{os.getcwd()}/{data.GIT_DIR}/output.gv', view=True)
