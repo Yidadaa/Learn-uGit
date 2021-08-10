@@ -119,6 +119,10 @@ def get_commit(oid):
 
 
 def get_oid(name):
+    # alias @ as HEAD
+    if name == '@':
+        name = 'HEAD'
+
     # name is ref
     refs_to_search = [
         f'{name}',
