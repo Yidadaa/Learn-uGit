@@ -124,7 +124,7 @@ def k(args):
     for refname, ref in data.iter_refs():
         dot.node(refname)
         dot.node(ref.value)
-        dot.edge(ref.value, refname)
+        dot.edge(refname, ref.value)
         if not ref.symbolic:
             oids.add(ref.value)
 
