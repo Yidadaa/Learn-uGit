@@ -77,29 +77,29 @@ def read_tree(tree_oid):
 
 
 def commit(message):
-    HEAD = data.get_ref('HEAD')
+    HEAD = data.get_ref('HEAD').value
     commit = ''.join([
         f'tree {write_tree()}\n',
         '\n' if not HEAD else f'parent {HEAD}\n\n',
         f'{message}\n'
     ])
     oid = data.hash_object(commit.encode(), 'commit')
-    data.update_ref('HEAD', oid)
+    data.update_ref('HEAD', data.RefValue(False, oid))
     return oid
 
 
 def checkout(oid):
     commit = get_commit(oid)
     read_tree(commit.tree)
-    data.update_ref('HEAD', oid)
+    data.update_ref('HEAD', data.RefValue(False, oid))
 
 
 def create_tag(name, oid):
-    data.update_ref(f'refs/tags/{name}', oid)
+    data.update_ref(f'refs/tags/{name}', data.RefValue(False, oid))
 
 
 def create_branch(name, oid):
-    data.update_ref(f'refs/heads/{name}', oid)
+    data.update_ref(f'refs/heads/{name}', data.RefValue(False, oid))
 
 
 Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
@@ -149,7 +149,7 @@ def get_oid(name):
         f'refs/heads/{name}'
     ]
     for ref in refs_to_search:
-        searched_ref = data.get_ref(ref)
+        searched_ref = data.get_ref(ref).value
         if searched_ref:
             return searched_ref
     # name is sha1
