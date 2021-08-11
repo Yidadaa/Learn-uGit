@@ -123,9 +123,10 @@ def k(args):
     oids = set()
     for refname, ref in data.iter_refs():
         dot.node(refname)
-        dot.node(ref)
-        dot.edge(ref, refname)
-        oids.add(ref)
+        dot.node(ref.value)
+        dot.edge(ref.value, refname)
+        if not ref.symbolic:
+            oids.add(ref.value)
 
     for oid in base.iter_commits_and_parents(oids):
         commit = base.get_commit(oid)
