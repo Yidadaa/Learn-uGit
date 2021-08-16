@@ -88,10 +88,21 @@ def commit(message):
     return oid
 
 
-def checkout(oid):
+def checkout(name):
+    oid = get_oid(name)
     commit = get_commit(oid)
     read_tree(commit.tree)
-    data.update_ref('HEAD', data.RefValue(False, oid))
+
+    if is_branch(name):
+        HEAD = data.RefValue(symbolic=True, value=f'refs/heads/{name}')
+    else:
+        HEAD = data.RefValue(symbolic=False, value=oid)
+
+    data.update_ref('HEAD', HEAD, deref=False)
+
+
+def is_branch(branch):
+    return data.get_ref(f'refs/heads/{branch}').value is not None
 
 
 def create_tag(name, oid):
