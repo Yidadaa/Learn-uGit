@@ -8,6 +8,12 @@ from collections import namedtuple, deque
 from . import data
 
 
+def init():
+    data.init()
+    data.update_ref('HEAD', data.RefValue(
+        symbolic=True, value='refs/heads/master'))
+
+
 def write_tree(directory='.'):
     '''Write directory to store recurisvely.'''
     entries = []
