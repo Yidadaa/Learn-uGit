@@ -107,6 +107,11 @@ def checkout(name):
     data.update_ref('HEAD', HEAD, deref=False)
 
 
+def iter_branch_names():
+    for refname, _ in data.iter_refs('refs/heads/'):
+        yield os.path.relpath(refname, 'refs/heads/')
+
+
 def is_branch(branch):
     return data.get_ref(f'refs/heads/{branch}').value is not None
 
