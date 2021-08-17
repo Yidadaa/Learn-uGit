@@ -15,7 +15,7 @@ RefValue = namedtuple('RefValue', ['symbolic', 'value'])
 
 
 def update_ref(ref, value: RefValue, deref=True):
-    ref, _ = _get_ref_internal(ref, deref=False)
+    ref, _ = _get_ref_internal(ref, deref)
 
     assert value.value
     if value.symbolic:
@@ -26,6 +26,7 @@ def update_ref(ref, value: RefValue, deref=True):
     os.makedirs(os.path.dirname(ref_path), exist_ok=True)
     with open(ref_path, 'w') as f:
         f.write(value)
+    print('update ref: ', ref, value, ref_path)
 
 
 def get_ref(ref, deref=True):
