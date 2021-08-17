@@ -125,6 +125,10 @@ def get_branch_name():
     return os.path.relpath(HEAD, 'refs/heads')
 
 
+def reset(oid):
+    data.update_ref('HEAD', data.RefValue(symbolic=False, value=oid))
+
+
 def create_tag(name, oid):
     data.update_ref(f'refs/tags/{name}', data.RefValue(False, oid))
 
