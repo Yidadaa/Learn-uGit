@@ -208,4 +208,4 @@ def get_oid(name):
 
 
 def is_ignored(path):
-    return '.ugit' in path.split('/')
+    return '.ugit' in path
