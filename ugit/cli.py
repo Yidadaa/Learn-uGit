@@ -207,7 +207,7 @@ def status(args):
         print(f'{action:>12}: {path}')
 
     if not head_printed:
-        print('Nothing to be commited')
+        print('nothing to commit, working tree clean')
 
 
 def reset(args):
