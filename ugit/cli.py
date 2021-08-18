@@ -4,7 +4,6 @@ import sys
 import os
 import textwrap
 from graphviz import Digraph
-from graphviz.backend import view
 
 from . import base
 from . import data
@@ -53,6 +52,10 @@ def parse_args():
     show_parser = commands.add_parser('show')
     show_parser.set_defaults(func=show)
     show_parser.add_argument('oid', default='@', type=oid, nargs='?')
+
+    diff_parser = commands.add_parser('diff')
+    diff_parser.set_defaults(func=_diff)
+    diff_parser.add_argument('commit', default='@', type=oid, nargs='?')
 
     checkout_parser = commands.add_parser('checkout')
     checkout_parser.set_defaults(func=checkout)
@@ -138,6 +141,13 @@ def show(args):
 
     result = diff.diff_trees(base.get_tree(
         parent_tree), base.get_tree(commit.tree))
+    print(result)
+
+
+def _diff(args):
+    tree = args.commit and base.get_commit(args.commit).tree
+
+    result = diff.diff_trees(base.get_tree(tree), base.get_working_tree())
     print(result)
 
 
