@@ -105,11 +105,18 @@ def read_tree_merged(t_HEAD, t_other):
 
 def commit(message):
     HEAD = data.get_ref('HEAD').value
+    MERGE_HEAD = data.get_ref('MERGE_HEAD').value
     commit = ''.join([
         f'tree {write_tree()}\n',
-        '\n' if not HEAD else f'parent {HEAD}\n\n',
-        f'{message}\n'
+        '\n' if not HEAD else f'parent {HEAD}\n',
+        '\n' if not MERGE_HEAD else f'parent {MERGE_HEAD}\n',
+        f'\n{message}\n'
     ])
+
+    # then delete merge head
+    if MERGE_HEAD:
+        data.delete_ref('MERGE_HEAD', deref=False)
+
     oid = data.hash_object(commit.encode(), 'commit')
     data.update_ref('HEAD', data.RefValue(False, oid))
     return oid
@@ -156,8 +163,10 @@ def merge(other):
     c_HEAD = get_commit(HEAD)
     c_other = get_commit(other)
 
+    data.update_ref('MERGE_HEAD', data.RefValue(symbolic=False, value=other))
+
     read_tree_merged(c_HEAD.tree, c_other.tree)
-    print('Merged in working tree')
+    print('Merged in working tree\nPlease commit to continue')
 
 
 def create_tag(name, oid):
@@ -199,7 +208,7 @@ def iter_commits_and_parents(oids):
         visited.add(oid)
         yield oid
         commit = get_commit(oid)
-        oids.appendleft(commit.parents[:1])
+        oids.extendleft(commit.parents[:1])
         oids.extend(commit.parents[1:])
 
 
