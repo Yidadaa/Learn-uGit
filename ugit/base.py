@@ -168,11 +168,11 @@ def create_branch(name, oid):
     data.update_ref(f'refs/heads/{name}', data.RefValue(False, oid))
 
 
-Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
+Commit = namedtuple('Commit', ['tree', 'parents', 'message'])
 
 
 def get_commit(oid):
-    parent = None
+    parents = []
 
     commit = data.get_object(oid, 'commit').decode()
     lines = iter(commit.splitlines())
@@ -181,11 +181,11 @@ def get_commit(oid):
         if k == 'tree':
             tree = v
         elif k == 'parent':
-            parent = v
+            parents.append(v)
         else:
             raise Exception(f'Unknown field {k}')
     message = '\n'.join(lines)
-    return Commit(tree=tree, parent=parent, message=message)
+    return Commit(tree=tree, parents=parents, message=message)
 
 
 def iter_commits_and_parents(oids):
@@ -199,7 +199,8 @@ def iter_commits_and_parents(oids):
         visited.add(oid)
         yield oid
         commit = get_commit(oid)
-        oids.appendleft(commit.parent)
+        oids.appendleft(commit.parents[:1])
+        oids.extend(commit.parents[1:])
 
 
 def get_oid(name):

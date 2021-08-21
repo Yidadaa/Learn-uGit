@@ -138,8 +138,8 @@ def show(args):
         return
     commit = base.get_commit(args.oid)
     parent_tree = None
-    if commit.parent:
-        parent_tree = base.get_commit(commit.parent).tree
+    if commit.parents:
+        parent_tree = base.get_commit(commit.parents[0]).tree
 
     _print_commit(args.oid, commit)
 
@@ -188,8 +188,8 @@ def k(args):
     for oid in base.iter_commits_and_parents(oids):
         commit = base.get_commit(oid)
         dot.node(oid, oid[:10])
-        if commit.parent:
-            dot.edge(commit.parent, oid)
+        for parent in commit.parents:
+            dot.edge(parent, oid)
     print(dot.source)
     dot.render(f'{os.getcwd()}/{data.GIT_DIR}/output.gv', view=True)
 
