@@ -162,11 +162,18 @@ def merge(other):
     HEAD = data.get_ref('HEAD').value
     assert HEAD
     merge_base = get_merge_base(other, HEAD)
-    c_base = get_commit(merge_base)
-    c_HEAD = get_commit(HEAD)
     c_other = get_commit(other)
 
+    # fast-forward merge
+    if merge_base == HEAD:
+        read_tree(c_other.tree)
+        data.update_ref('HEAD', data.RefValue(symbolic=False, value=other))
+        print('Fast-forward merge, no need to commit')
+        return
+
     data.update_ref('MERGE_HEAD', data.RefValue(symbolic=False, value=other))
+    c_base = get_commit(merge_base)
+    c_HEAD = get_commit(HEAD)
 
     read_tree_merged(c_base.tree, c_HEAD.tree, c_other.tree)
     print('Merged in working tree\nPlease commit to continue')
