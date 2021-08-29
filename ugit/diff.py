@@ -1,7 +1,7 @@
 from collections import defaultdict
 import difflib
 
-from . import data
+from . import data  # pylint: disable=relative-beyond-top-level
 
 
 class Flags:
@@ -54,14 +54,15 @@ def diff_blobs(o_from, o_to, path='blob'):
     return '\n'.join(result)
 
 
-def merge_trees(t_HEAD, t_other):
+def merge_trees(t_base, t_HEAD, t_other):
     tree = {}
-    for path, o_HEAD, o_other in compare_trees(t_HEAD, t_other):
-        tree[path] = merge_blobs(o_HEAD, o_other)
+    for path, o_base, o_HEAD, o_other in compare_trees(t_base, t_HEAD, t_other):
+        tree[path] = merge_blobs(o_base, o_HEAD, o_other)
     return tree
 
 
-def merge_blobs(o_HEAD, o_other):
+def merge_blobs(o_base, o_HEAD, o_other):
+    # TODO: Implement three-way merge
     b_HEAD, b_other = _get_blob_lines(o_HEAD), _get_blob_lines(o_other)
     # if both file is text file, diff and merge it
     if b_HEAD != Flags.BYTE_BLOB and b_other != Flags.BYTE_BLOB:

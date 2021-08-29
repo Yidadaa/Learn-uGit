@@ -5,9 +5,9 @@ import os
 import textwrap
 from graphviz import Digraph
 
-from . import base
-from . import data
-from . import diff
+from . import base  # pylint: disable=relative-beyond-top-level
+from . import data  # pylint: disable=relative-beyond-top-level
+from . import diff  # pylint: disable=relative-beyond-top-level
 
 
 def main():
