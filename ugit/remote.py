@@ -1,4 +1,6 @@
 import os
+
+from . import base  # pylint: disable=relative-beyond-top-level
 from . import data  # pylint: disable=relative-beyond-top-level
 
 REMOTE_REFS_BASE = 'refs/heads'
@@ -9,6 +11,10 @@ def fetch(remote_path):
     print('Will fetch the following refs:')
     # get remote refs
     refs = _get_remote_refs(remote_path, REMOTE_REFS_BASE)
+
+    # fetch missing objects
+    for oid in base.iter_objects_in_commits(refs.values()):
+        data.fetch_object_if_missing(oid, remote_path)
 
     # update local refs
     for remote_name, value in refs.items():

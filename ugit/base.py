@@ -230,6 +230,28 @@ def iter_commits_and_parents(oids):
         oids.extend(commit.parents[1:])
 
 
+def iter_objects_in_commits(oids):
+    visited = set()
+
+    def _iter_objects_in_tree(oid):
+        '''Get all objects in tree via DFS'''
+        visited.add(oid)
+        yield oid
+        for type_, oid, _ in _iter_tree_entries(oid):
+            if type_ == 'tree':
+                yield from _iter_objects_in_tree(oid)
+            else:
+                visited.add(oid)
+                yield oid
+
+    # get objects in parent tree
+    for oid in iter_commits_and_parents(oids):
+        yield oid
+        commit = get_commit(oid)
+        if commit.tree not in visited:
+            yield from _iter_objects_in_tree(commit.tree)
+
+
 def get_oid(name):
     # alias @ as HEAD
     if name == '@':
