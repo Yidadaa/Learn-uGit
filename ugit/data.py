@@ -113,3 +113,9 @@ def fetch_object_if_missing(oid, remote_git_dir):
     remote_git_dir = os.path.join(remote_git_dir, '.ugit')
     shutil.copy(os.path.join(remote_git_dir, 'objects', oid),
                 os.path.join(GIT_DIR, 'objects', oid))
+
+
+def push_object(oid, remote_git_dir):
+    remote_git_dir = os.path.join(remote_git_dir, '.ugit')
+    shutil.copy(os.path.join(GIT_DIR, 'objects', oid),
+                os.path.join(remote_git_dir, 'objects', oid))

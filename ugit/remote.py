@@ -26,3 +26,18 @@ def fetch(remote_path):
 def _get_remote_refs(remote_path, prefix=''):
     with data.change_git_dir(remote_path):
         return {refname: ref.value for refname, ref in data.iter_refs(prefix)}
+
+
+def push(remote_path, refname):
+    local_ref = data.get_ref(refname).value
+    assert local_ref
+
+    objects_to_push = base.iter_objects_in_commits({local_ref})
+
+    # push all objects
+    for oid in objects_to_push:
+        data.push_object(oid, remote_path)
+
+    # update remote ref
+    with data.change_git_dir(remote_path):
+        data.update_ref(refname, data.RefValue(False, local_ref))
