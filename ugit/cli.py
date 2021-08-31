@@ -251,4 +251,4 @@ def fetch(args):
 
 
 def push(args):
-    remote.push(args.remote, os.path.join('refs/heads/', args.branch))
+    remote.push(args.remote, os.path.join('refs', 'heads', args.branch))

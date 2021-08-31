@@ -19,6 +19,7 @@ def fetch(remote_path):
     # update local refs
     for remote_name, value in refs.items():
         refname = os.path.relpath(remote_name, REMOTE_REFS_BASE)
+        # TODO: refactor all path with os.path.join
         data.update_ref(f'{LOCAL_REFS_BASE}/{refname}',
                         data.RefValue(symbolic=False, value=value))
 
@@ -30,8 +31,13 @@ def _get_remote_refs(remote_path, prefix=''):
 
 def push(remote_path, refname):
     remote_refs = _get_remote_refs(remote_path)
+    remote_ref = remote_refs.get(refname)
     local_ref = data.get_ref(refname).value
     assert local_ref
+
+    # disallow force push
+    could_push = base.is_ancestor_of(local_ref, remote_ref)
+    assert not remote_ref or could_push
 
     # get diff of remote objects and local objects
     known_remote_refs = filter(data.object_exists, remote_refs.values())
