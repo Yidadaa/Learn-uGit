@@ -281,12 +281,26 @@ def get_oid(name):
 
 
 def add(filenames):
+    def add_file(filename):
+        filename = os.path.relpath(filename)
+        with open(filename, 'rb') as f:
+            oid = data.hash_object(f.read())
+        index[filename] = oid
+
+    def add_directory(dirname):
+        for root, _, filenames in os.walk(dirname):
+            for filename in filenames:
+                path = os.path.relpath(os.path.join(root, filename))
+                if is_ignored(path) or not os.path.isfile(path):
+                    continue
+                add_file(path)
+
     with data.get_index() as index:
         for filename in filenames:
-            filename = os.path.relpath(filename)
-            with open(filename, 'rb') as f:
-                oid = data.hash_object(f.read())
-            index[filename] = oid
+            if os.path.isfile(filename):
+                add_file(filename)
+            elif os.path.isdir(filename):
+                add_directory(filename)
 
 
 def is_ignored(path):
