@@ -1,5 +1,6 @@
 from genericpath import exists
 import os
+import json
 import shutil
 import hashlib
 from collections import namedtuple
@@ -79,6 +80,20 @@ def iter_refs(prefix='', deref=True):
         ref = get_ref(refname, deref=deref)
         if ref.value:
             yield refname, ref
+
+
+@contextmanager
+def get_index():
+    index = {}
+    index_file = os.path.join(GIT_DIR, 'index')
+    if os.path.isfile(index_file):
+        with open(index_file) as f:
+            index = json.load(f)
+
+    yield index
+
+    with open(index_file, 'w') as f:
+        json.dump(index, f)
 
 
 def hash_object(data, type_='blob'):
