@@ -57,7 +57,8 @@ def parse_args():
 
     diff_parser = commands.add_parser('diff')
     diff_parser.set_defaults(func=_diff)
-    diff_parser.add_argument('commit', default='@', type=oid, nargs='?')
+    diff_parser.add_argument('--cached', action='store_true')
+    diff_parser.add_argument('commit', nargs='?')
 
     checkout_parser = commands.add_parser('checkout')
     checkout_parser.set_defaults(func=checkout)
@@ -169,9 +170,22 @@ def show(args):
 
 
 def _diff(args):
-    tree = args.commit and base.get_commit(args.commit).tree
+    oid = args.commit and base.get_oid(args.commit)
 
-    result = diff.diff_trees(base.get_tree(tree), base.get_working_tree())
+    if args.commit:
+        tree_from = base.get_tree(oid and base.get_commit(oid).tree)
+
+    if args.cached:
+        tree_to = base.get_index_tree()
+        if not args.commit:
+            oid = base.get_oid('@')
+            tree_from = base.get_tree(oid and base.get_commit(oid).tree)
+    else:
+        tree_to = base.get_working_tree()
+        if not args.commit:
+            tree_from = base.get_index_tree()
+
+    result = diff.diff_trees(tree_from, tree_to)
     print(result)
 
 
@@ -227,7 +241,10 @@ def status(args):
         print(f'Merging with {MERGE_HEAD[:10]}')
 
     head_printed = False
+    # TODO: fix head_tree is none after add files
     HEAD_tree = HEAD and base.get_commit(HEAD).tree
+    print(HEAD, base.get_commit(HEAD).tree)
+    print(base.get_tree(HEAD_tree))
     for path, action in diff.iter_changed_files(base.get_tree(HEAD_tree), base.get_index_tree()):
         if not head_printed:
             print('\nChanges to be commited:\n')
