@@ -228,14 +228,21 @@ def status(args):
 
     head_printed = False
     HEAD_tree = HEAD and base.get_commit(HEAD).tree
-    for path, action in diff.iter_changed_files(base.get_tree(HEAD_tree), base.get_working_tree()):
+    for path, action in diff.iter_changed_files(base.get_tree(HEAD_tree), base.get_index_tree()):
         if not head_printed:
             print('\nChanges to be commited:\n')
             head_printed = True
         print(f'{action:>12}: {path}')
 
+    no_change_head_printed = False
+    for path, action in diff.iter_changed_files(base.get_index_tree(), base.get_working_tree()):
+        if not no_change_head_printed:
+            print('\nChanges not staged for commit:\n')
+        print(f'{action:>12}: {path}')
+
     if not head_printed:
         print('nothing to commit, working tree clean')
+    print('\n')
 
 
 def reset(args):
